@@ -83,4 +83,32 @@ def plot_rolling_performance(portfolio_returns, benchmark_returns, window=12, sa
     plt.grid(True)
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_risk_contribution_bar(weights, cov_matrix, save_path=None):
+    """
+    Plot a risk contribution bar chart by asset class.
+    Args:
+        weights (dict or pd.Series): Portfolio weights
+        cov_matrix (pd.DataFrame): Covariance matrix of asset returns
+        save_path (str): If provided, save the plot to this path
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    w = np.array(list(weights.values()))
+    assets = list(weights.keys())
+    # Marginal contribution to risk
+    port_vol = np.sqrt(np.dot(w, np.dot(cov_matrix, w)))
+    mcr = np.dot(cov_matrix, w) / port_vol
+    # Risk contribution
+    rc = w * mcr
+    plt.figure(figsize=(10, 6))
+    plt.bar(assets, rc)
+    plt.ylabel('Risk Contribution')
+    plt.title('Risk Contribution by Asset Class')
+    plt.xticks(rotation=45)
+    plt.grid(True, axis='y')
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
