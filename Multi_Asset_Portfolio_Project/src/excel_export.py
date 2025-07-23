@@ -82,3 +82,16 @@ def add_summary_row(df, summary_type='total'):
     else:
         raise ValueError("summary_type must be 'total' or 'average'")
     return pd.concat([df, pd.DataFrame([summary])]) 
+
+
+def freeze_panes(writer, sheet_name, row=1, col=1):
+    """
+    Helper to freeze the top row and first column in an Excel worksheet.
+    Args:
+        writer (pd.ExcelWriter): ExcelWriter object
+        sheet_name (str): Name of the sheet to freeze panes
+        row (int): Row index to freeze (default 1)
+        col (int): Column index to freeze (default 1)
+    """
+    worksheet = writer.sheets[sheet_name]
+    worksheet.freeze_panes(row, col) 
