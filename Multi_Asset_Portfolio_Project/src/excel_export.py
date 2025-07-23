@@ -15,4 +15,22 @@ def create_excel_dashboard(sheets_dict, file_path):
                 pd.DataFrame([data]).to_excel(writer, sheet_name=sheet)
             else:
                 pd.DataFrame(data).to_excel(writer, sheet_name=sheet)
-        writer.save() 
+        writer.save()
+
+
+def format_excel_sheet(writer, sheet_name, column_widths=None, header_format=None):
+    """
+    Helper to format Excel sheets: set column widths and header formatting.
+    Args:
+        writer (pd.ExcelWriter): ExcelWriter object
+        sheet_name (str): Name of the sheet to format
+        column_widths (dict): {col_idx: width}
+        header_format (dict): Format options for header
+    """
+    worksheet = writer.sheets[sheet_name]
+    if column_widths:
+        for col_idx, width in column_widths.items():
+            worksheet.set_column(col_idx, col_idx, width)
+    if header_format:
+        fmt = writer.book.add_format(header_format)
+        worksheet.set_row(0, None, fmt) 
