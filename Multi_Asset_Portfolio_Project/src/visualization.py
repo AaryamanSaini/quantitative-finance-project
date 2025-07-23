@@ -22,4 +22,23 @@ def plot_efficient_frontier(weights_list, returns_list, vol_list, optimal_point,
     plt.grid(True)
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_asset_allocation_pie(weights, save_path=None):
+    """
+    Plot an asset allocation pie chart with percentage labels.
+    Args:
+        weights (dict or pd.Series): Asset weights
+        save_path (str): If provided, save the plot to this path
+    """
+    import matplotlib.pyplot as plt
+    labels = list(weights.keys())
+    sizes = list(weights.values())
+    plt.figure(figsize=(8, 8))
+    plt.pie(sizes, labels=labels, autopct='%1.1f%%', startangle=140, counterclock=False)
+    plt.title('Asset Allocation')
+    plt.axis('equal')
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
