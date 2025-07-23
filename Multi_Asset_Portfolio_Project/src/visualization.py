@@ -58,4 +58,29 @@ def plot_correlation_heatmap(corr_matrix, save_path=None):
     plt.title('Correlation Heatmap of Asset Classes')
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_rolling_performance(portfolio_returns, benchmark_returns, window=12, save_path=None):
+    """
+    Plot rolling performance (returns) vs benchmarks over time.
+    Args:
+        portfolio_returns (pd.Series): Portfolio returns (monthly)
+        benchmark_returns (dict): Dict of benchmark name to returns (monthly)
+        window (int): Rolling window size in months
+        save_path (str): If provided, save the plot to this path
+    """
+    import matplotlib.pyplot as plt
+    roll_port = portfolio_returns.rolling(window).mean()
+    plt.figure(figsize=(12, 6))
+    plt.plot(roll_port, label='Portfolio')
+    for name, bench in benchmark_returns.items():
+        plt.plot(bench.rolling(window).mean(), label=name)
+    plt.title(f'Rolling {window}-Month Performance')
+    plt.xlabel('Date')
+    plt.ylabel('Rolling Return')
+    plt.legend()
+    plt.grid(True)
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
