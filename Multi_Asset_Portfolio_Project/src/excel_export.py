@@ -47,3 +47,18 @@ def embed_chart_in_excel(writer, sheet_name, image_path, cell='B2'):
     """
     worksheet = writer.sheets[sheet_name]
     worksheet.insert_image(cell, image_path) 
+
+
+def auto_adjust_column_widths(df, worksheet):
+    """
+    Auto-adjust column widths for all columns in a DataFrame when exporting to Excel.
+    Args:
+        df (pd.DataFrame): DataFrame being exported
+        worksheet (xlsxwriter worksheet): Worksheet object
+    """
+    for i, col in enumerate(df.columns):
+        max_len = max(
+            df[col].astype(str).map(len).max(),
+            len(str(col))
+        ) + 2
+        worksheet.set_column(i, i, max_len) 
