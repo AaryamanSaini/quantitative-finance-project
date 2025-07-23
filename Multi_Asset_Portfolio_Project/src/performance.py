@@ -66,6 +66,31 @@ def performance_attribution(portfolio_returns, asset_returns, weights, benchmark
         vs_bench = (portfolio_returns - benchmark_returns).sum()
     return {'by_asset': by_asset, 'vs_benchmark': vs_bench}
 
+
+def dynamic_rebalancing(current_weights, target_weights, liquidity=None, transaction_costs=0.001):
+    """
+    Calculate optimal rebalancing trades given transaction costs and liquidity constraints.
+    Args:
+        current_weights (dict): Current portfolio weights
+        target_weights (dict): Target portfolio weights
+        liquidity (dict): Max tradable % per asset (optional)
+        transaction_costs (float): Per-trade cost
+    Returns:
+        dict: Trades to execute, total transaction cost
+    """
+    trades = {}
+    total_cost = 0
+    for asset in target_weights:
+        curr = current_weights.get(asset, 0)
+        tgt = target_weights[asset]
+        trade = tgt - curr
+        # Apply liquidity constraint
+        if liquidity and asset in liquidity:
+            trade = np.clip(trade, -liquidity[asset], liquidity[asset])
+        trades[asset] = trade
+        total_cost += abs(trade) * transaction_costs
+    return {'trades': trades, 'total_cost': total_cost}
+
 # Example test (to be removed in production)
 if __name__ == "__main__":
     idx = pd.date_range('2020-01-31', periods=36, freq='M')
