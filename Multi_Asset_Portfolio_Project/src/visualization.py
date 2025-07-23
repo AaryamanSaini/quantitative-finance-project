@@ -41,4 +41,21 @@ def plot_asset_allocation_pie(weights, save_path=None):
     plt.axis('equal')
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_correlation_heatmap(corr_matrix, save_path=None):
+    """
+    Plot a correlation heatmap of all asset classes.
+    Args:
+        corr_matrix (pd.DataFrame): Correlation matrix
+        save_path (str): If provided, save the plot to this path
+    """
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+    plt.figure(figsize=(10, 8))
+    sns.heatmap(corr_matrix, annot=True, cmap='coolwarm', center=0, fmt='.2f', square=True)
+    plt.title('Correlation Heatmap of Asset Classes')
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
