@@ -144,4 +144,28 @@ def plot_stress_test_results(stress_results, chart_type='bar', save_path=None):
         ax.set_title('Stress Test Results - Max Drawdown (Radar)')
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_manager_comparison_scatter(manager_metrics, save_path=None):
+    """
+    Plot a manager comparison scatter plot (risk vs return).
+    Args:
+        manager_metrics (pd.DataFrame): DataFrame with columns 'Net_Return' and 'Sharpe' or 'Volatility'
+        save_path (str): If provided, save the plot to this path
+    """
+    import matplotlib.pyplot as plt
+    x = manager_metrics['Sharpe'] if 'Sharpe' in manager_metrics else manager_metrics['Volatility']
+    y = manager_metrics['Net_Return']
+    labels = manager_metrics['Manager'] if 'Manager' in manager_metrics else manager_metrics.index
+    plt.figure(figsize=(10, 6))
+    plt.scatter(x, y, c='blue', s=100)
+    for i, label in enumerate(labels):
+        plt.annotate(label, (x.iloc[i], y.iloc[i]), textcoords="offset points", xytext=(5,5), ha='left', fontsize=9)
+    plt.xlabel('Sharpe Ratio' if 'Sharpe' in manager_metrics else 'Volatility')
+    plt.ylabel('Net Return')
+    plt.title('Manager Comparison: Risk vs Return')
+    plt.grid(True)
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
