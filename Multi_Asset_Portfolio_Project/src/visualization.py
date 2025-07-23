@@ -111,4 +111,37 @@ def plot_risk_contribution_bar(weights, cov_matrix, save_path=None):
     plt.grid(True, axis='y')
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_stress_test_results(stress_results, chart_type='bar', save_path=None):
+    """
+    Plot stress test results as a radar or bar chart.
+    Args:
+        stress_results (dict): Scenario name to result dict (e.g., max_drawdown, total_return)
+        chart_type (str): 'bar' or 'radar'
+        save_path (str): If provided, save the plot to this path
+    """
+    import matplotlib.pyplot as plt
+    import numpy as np
+    scenarios = list(stress_results.keys())
+    values = [stress_results[s].get('max_drawdown', 0) for s in scenarios]
+    if chart_type == 'bar':
+        plt.figure(figsize=(10, 6))
+        plt.bar(scenarios, values, color='orange')
+        plt.ylabel('Max Drawdown')
+        plt.title('Stress Test Results - Max Drawdown by Scenario')
+        plt.xticks(rotation=30)
+        plt.grid(True, axis='y')
+    elif chart_type == 'radar':
+        angles = np.linspace(0, 2 * np.pi, len(scenarios), endpoint=False).tolist()
+        values += values[:1]
+        angles += angles[:1]
+        fig, ax = plt.subplots(figsize=(8, 8), subplot_kw=dict(polar=True))
+        ax.plot(angles, values, 'o-', linewidth=2)
+        ax.fill(angles, values, alpha=0.25)
+        ax.set_thetagrids(np.degrees(angles[:-1]), scenarios)
+        ax.set_title('Stress Test Results - Max Drawdown (Radar)')
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
