@@ -62,3 +62,23 @@ def auto_adjust_column_widths(df, worksheet):
             len(str(col))
         ) + 2
         worksheet.set_column(i, i, max_len) 
+
+
+def add_summary_row(df, summary_type='total'):
+    """
+    Add a summary row (total or average) to a DataFrame before exporting to Excel.
+    Args:
+        df (pd.DataFrame): DataFrame to summarize
+        summary_type (str): 'total' or 'average'
+    Returns:
+        pd.DataFrame: DataFrame with summary row appended
+    """
+    if summary_type == 'total':
+        summary = df.sum(numeric_only=True)
+        summary.name = 'Total'
+    elif summary_type == 'average':
+        summary = df.mean(numeric_only=True)
+        summary.name = 'Average'
+    else:
+        raise ValueError("summary_type must be 'total' or 'average'")
+    return pd.concat([df, pd.DataFrame([summary])]) 
