@@ -34,3 +34,16 @@ def format_excel_sheet(writer, sheet_name, column_widths=None, header_format=Non
     if header_format:
         fmt = writer.book.add_format(header_format)
         worksheet.set_row(0, None, fmt) 
+
+
+def embed_chart_in_excel(writer, sheet_name, image_path, cell='B2'):
+    """
+    Helper to embed a chart image into an Excel sheet.
+    Args:
+        writer (pd.ExcelWriter): ExcelWriter object
+        sheet_name (str): Name of the sheet to embed the image
+        image_path (str): Path to the image file
+        cell (str): Cell location to insert the image
+    """
+    worksheet = writer.sheets[sheet_name]
+    worksheet.insert_image(cell, image_path) 
