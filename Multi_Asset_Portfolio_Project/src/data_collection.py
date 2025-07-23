@@ -30,7 +30,24 @@ def collect_market_data(tickers=ASSET_TICKERS, start=START_DATE, end=END_DATE, s
     """
     np.random.seed(seed)
     # Download daily adjusted close prices
-    data = yf.download(tickers, start=start, end=end, progress=False)['Adj Close']
+    data = yf.download(tickers, start=start, end=end, progress=False)
+    
+    # Handle different yfinance output formats
+    if isinstance(data.columns, pd.MultiIndex):
+        # Multi-level columns (newer yfinance version)
+        if 'Adj Close' in data.columns.get_level_values(0):
+            data = data['Adj Close']
+        else:
+            # Fallback to Close if Adj Close not available
+            data = data['Close']
+    else:
+        # Single-level columns (older yfinance version)
+        if 'Adj Close' in data.columns:
+            data = data['Adj Close']
+        else:
+            # Fallback to Close
+            data = data['Close']
+    
     # Forward fill and drop rows with all NaNs
     data = data.ffill().dropna(how='all')
     # Resample to month-end prices

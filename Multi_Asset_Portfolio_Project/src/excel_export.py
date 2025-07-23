@@ -15,7 +15,6 @@ def create_excel_dashboard(sheets_dict, file_path):
                 pd.DataFrame([data]).to_excel(writer, sheet_name=sheet)
             else:
                 pd.DataFrame(data).to_excel(writer, sheet_name=sheet)
-        writer.save()
 
 
 def format_excel_sheet(writer, sheet_name, column_widths=None, header_format=None):
@@ -33,7 +32,7 @@ def format_excel_sheet(writer, sheet_name, column_widths=None, header_format=Non
             worksheet.set_column(col_idx, col_idx, width)
     if header_format:
         fmt = writer.book.add_format(header_format)
-        worksheet.set_row(0, None, fmt) 
+        worksheet.set_row(0, None, fmt)
 
 
 def embed_chart_in_excel(writer, sheet_name, image_path, cell='B2'):
@@ -46,7 +45,7 @@ def embed_chart_in_excel(writer, sheet_name, image_path, cell='B2'):
         cell (str): Cell location to insert the image
     """
     worksheet = writer.sheets[sheet_name]
-    worksheet.insert_image(cell, image_path) 
+    worksheet.insert_image(cell, image_path)
 
 
 def auto_adjust_column_widths(df, worksheet):
@@ -61,7 +60,7 @@ def auto_adjust_column_widths(df, worksheet):
             df[col].astype(str).map(len).max(),
             len(str(col))
         ) + 2
-        worksheet.set_column(i, i, max_len) 
+        worksheet.set_column(i, i, max_len)
 
 
 def add_summary_row(df, summary_type='total'):
@@ -81,7 +80,7 @@ def add_summary_row(df, summary_type='total'):
         summary.name = 'Average'
     else:
         raise ValueError("summary_type must be 'total' or 'average'")
-    return pd.concat([df, pd.DataFrame([summary])]) 
+    return pd.concat([df, pd.DataFrame([summary])])
 
 
 def freeze_panes(writer, sheet_name, row=1, col=1):

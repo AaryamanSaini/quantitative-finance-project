@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Optimization Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 300px;
+            background-color: #1f2937;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -150px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        .info-icon {
+            color: #60a5fa;
+            cursor: help;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body class="bg-black text-white">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <div class="mb-4">
+                <h2 class="text-2xl font-semibold text-blue-400">Aaryaman Saini</h2>
+                <p class="text-gray-300">Quantitative Finance Portfolio Optimization Project</p>
+            </div>
+            <h1 class="text-4xl font-bold text-white mb-2">Portfolio Optimization Dashboard</h1>
+            <p class="text-gray-300 mb-4">Multi-Asset Portfolio Management System</p>
+            <div class="bg-gray-900 border-l-4 border-blue-500 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-gray-300">
+                            <strong class="text-blue-400">Project Overview:</strong> This institutional-grade portfolio optimization system demonstrates advanced quantitative finance techniques including mean-variance optimization, ESG integration, risk analytics, and dynamic rebalancing. It showcases professional portfolio management capabilities and quantitative modeling expertise.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Data Input Section -->
+        <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6 mb-8">
+            <h3 class="text-xl font-semibold text-white mb-4">
+                Portfolio Parameters
+                <span class="tooltip">
+                    <span class="info-icon">ⓘ</span>
+                    <span class="tooltiptext">
+                        <strong>Portfolio Parameters Explained:</strong><br><br>
+                        <strong>Risk-Free Rate:</strong> The return on risk-free assets (like Treasury bills). Used to calculate Sharpe ratio and opportunity cost.<br><br>
+                        <strong>Min Alternatives:</strong> Minimum allocation to alternative assets (hedge funds, private equity). Provides diversification and non-correlated returns.<br><br>
+                        <strong>Max Single Asset:</strong> Maximum concentration in any single asset class. Prevents over-concentration risk.<br><br>
+                        <strong>Min ESG Score:</strong> Minimum average ESG (Environmental, Social, Governance) score. Ensures sustainable investing practices.
+                    </span>
+                </span>
+            </h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Risk-Free Rate (%)
+                        <span class="tooltip">
+                            <span class="info-icon">ⓘ</span>
+                            <span class="tooltiptext">
+                                <strong>Risk-Free Rate:</strong> The theoretical return on an investment with zero risk. Typically based on government Treasury bills. Higher rates make risky assets less attractive, affecting optimal portfolio weights.
+                            </span>
+                        </span>
+                    </label>
+                    <input type="number" id="risk-free-rate" value="2.0" step="0.1" class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Min Alternatives (%)
+                        <span class="tooltip">
+                            <span class="info-icon">ⓘ</span>
+                            <span class="tooltiptext">
+                                <strong>Minimum Alternatives:</strong> Institutional portfolios typically allocate 20-40% to alternative assets for diversification. This constraint ensures exposure to hedge funds and private equity which have low correlation with traditional assets.
+                            </span>
+                        </span>
+                    </label>
+                    <input type="number" id="min-alternatives" value="20.0" step="1" class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Max Single Asset (%)
+                        <span class="tooltip">
+                            <span class="info-icon">ⓘ</span>
+                            <span class="tooltiptext">
+                                <strong>Maximum Single Asset:</strong> Prevents over-concentration in any single asset class. Institutional risk management typically limits single asset exposure to 30-40% to avoid concentration risk.
+                            </span>
+                        </span>
+                    </label>
+                    <input type="number" id="max-single" value="30.0" step="1" class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-2">
+                        Min ESG Score
+                        <span class="tooltip">
+                            <span class="info-icon">ⓘ</span>
+                            <span class="tooltiptext">
+                                <strong>Minimum ESG Score:</strong> ESG (Environmental, Social, Governance) scores range from 0-10. Higher scores indicate better sustainability practices. Institutional investors increasingly require minimum ESG standards.
+                            </span>
+                        </span>
+                    </label>
+                    <input type="number" id="min-esg" value="7.0" step="0.1" min="0" max="10" class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-white">
+                </div>
+            </div>
+            <div class="mt-4 flex gap-4">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors" onclick="runOptimization()">
+                    Run Optimization
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Run Optimization:</strong> Executes mean-variance optimization using the Markowitz framework. The algorithm maximizes Sharpe ratio while respecting all constraints. This is the core quantitative finance process used by institutional portfolio managers.
+                        </span>
+                    </span>
+                </button>
+                <button class="bg-gray-700 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded transition-colors" onclick="loadSampleData()">
+                    Load Sample Data
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Load Sample Data:</strong> Resets to the original sample portfolio results. This demonstrates the system's capabilities with realistic market data and shows typical institutional portfolio performance metrics.
+                        </span>
+                    </span>
+                </button>
+                <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors" onclick="exportToExcel()">
+                    Export to Excel
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Export to Excel:</strong> Generates a comprehensive Excel report with multiple sheets including portfolio summary, asset allocation, risk metrics, and charts. This is the standard format for institutional reporting and client presentations.
+                        </span>
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Key Metrics Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-300 mb-2">
+                    Sharpe Ratio
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Sharpe Ratio:</strong> Measures risk-adjusted returns. Formula: (Portfolio Return - Risk-Free Rate) / Portfolio Volatility. Higher values indicate better risk-adjusted performance. Institutional target: >1.0, Excellent: >2.0.
+                        </span>
+                    </span>
+                </h3>
+                <p class="text-3xl font-bold text-green-400" id="sharpe-ratio">2.33</p>
+                <p class="text-sm text-gray-400 mt-1">Risk-adjusted return metric</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-300 mb-2">
+                    Expected Return
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Expected Return:</strong> Annualized expected portfolio return based on historical data and optimization. This represents the mean return investors can expect over the long term, accounting for market conditions and asset correlations.
+                        </span>
+                    </span>
+                </h3>
+                <p class="text-3xl font-bold text-blue-400" id="expected-return">18.1%</p>
+                <p class="text-sm text-gray-400 mt-1">Annualized return</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-300 mb-2">
+                    Volatility
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Volatility:</strong> Annualized standard deviation of returns. Measures portfolio risk and price fluctuations. Lower volatility means more stable returns. Institutional portfolios typically target 5-15% annual volatility.
+                        </span>
+                    </span>
+                </h3>
+                <p class="text-3xl font-bold text-orange-400" id="volatility">6.9%</p>
+                <p class="text-sm text-gray-400 mt-1">Annualized risk</p>
+            </div>
+            <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+                <h3 class="text-lg font-semibold text-gray-300 mb-2">
+                    ESG Score
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>ESG Score:</strong> Environmental, Social, and Governance rating (0-10 scale). Higher scores indicate better sustainability practices. Institutional investors increasingly require minimum ESG standards for responsible investing.
+                        </span>
+                    </span>
+                </h3>
+                <p class="text-3xl font-bold text-purple-400" id="esg-score">7.9/10</p>
+                <p class="text-sm text-gray-400 mt-1">Sustainability rating</p>
+            </div>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            <!-- Asset Allocation Chart -->
+            <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+                <h3 class="text-xl font-semibold text-white mb-4">
+                    Asset Allocation
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Asset Allocation:</strong> Shows the optimal weight distribution across asset classes. This is the result of mean-variance optimization considering returns, risk, correlations, and constraints. Institutional portfolios typically diversify across multiple asset classes to reduce risk.
+                        </span>
+                    </span>
+                </h3>
+                <canvas id="allocation-chart" width="400" height="300"></canvas>
+            </div>
+            
+            <!-- Risk Metrics Chart -->
+            <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+                <h3 class="text-xl font-semibold text-white mb-4">
+                    Risk Metrics
+                    <span class="tooltip">
+                        <span class="info-icon">ⓘ</span>
+                        <span class="tooltiptext">
+                            <strong>Risk Metrics:</strong><br><br>
+                            <strong>95% VaR:</strong> Value at Risk - maximum expected loss with 95% confidence over a given period.<br><br>
+                            <strong>99% VaR:</strong> More conservative VaR measure with 99% confidence.<br><br>
+                            <strong>Max Drawdown:</strong> Largest peak-to-trough decline in portfolio value. Measures worst historical loss.
+                        </span>
+                    </span>
+                </h3>
+                <canvas id="risk-chart" width="400" height="300"></canvas>
+            </div>
+        </div>
+
+        <!-- Portfolio Details Table -->
+        <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6 mb-8">
+            <h3 class="text-xl font-semibold text-white mb-4">
+                Portfolio Details
+                <span class="tooltip">
+                    <span class="info-icon">ⓘ</span>
+                    <span class="tooltiptext">
+                        <strong>Portfolio Details:</strong> Detailed breakdown of each asset's contribution to the portfolio. Shows individual weights, expected returns, and risk contributions. This level of detail is essential for institutional portfolio management and client reporting.
+                    </span>
+                </span>
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gray-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Asset</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Weight</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Expected Return</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Risk Contribution</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-gray-900 divide-y divide-gray-700" id="portfolio-table">
+                        <!-- Table rows will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Status Section -->
+        <div class="bg-gray-900 rounded-lg shadow-lg border border-gray-700 p-6">
+            <h3 class="text-xl font-semibold text-white mb-4">
+                Status & Logs
+                <span class="tooltip">
+                    <span class="info-icon">ⓘ</span>
+                    <span class="tooltiptext">
+                        <strong>Status & Logs:</strong> Real-time logging of all optimization processes and system operations. This provides transparency into the quantitative finance calculations and helps with debugging and audit trails, which are essential for institutional applications.
+                    </span>
+                </span>
+            </h3>
+            <div id="status-log" class="bg-gray-800 p-4 rounded-md h-32 overflow-y-auto text-sm font-mono border border-gray-600">
+                <div class="text-green-400">✓ Dashboard loaded successfully</div>
+                <div class="text-blue-400">ℹ Ready to run optimization</div>
+            </div>
+        </div>
+
+        <!-- Educational Section -->
+        <div class="bg-gray-900 rounded-lg p-6 mt-8 border border-gray-700">
+            <h3 class="text-xl font-semibold text-blue-400 mb-4">📚 Educational Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h4 class="font-semibold text-blue-300 mb-2">🎯 What This Project Demonstrates:</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• Mean-variance portfolio optimization (Markowitz theory)</li>
+                        <li>• ESG integration in institutional investing</li>
+                        <li>• Risk analytics (VaR, stress testing, drawdown analysis)</li>
+                        <li>• Multi-asset class diversification strategies</li>
+                        <li>• Professional portfolio management workflows</li>
+                        <li>• Quantitative finance modeling and implementation</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-blue-300 mb-2">🏢 Institutional Applications:</h4>
+                    <ul class="text-sm text-gray-300 space-y-1">
+                        <li>• Institutional portfolio management</li>
+                        <li>• Client portfolio optimization</li>
+                        <li>• Risk management and compliance reporting</li>
+                        <li>• ESG and sustainable investing strategies</li>
+                        <li>• Multi-asset class fund management</li>
+                        <li>• Quantitative investment research</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html> 

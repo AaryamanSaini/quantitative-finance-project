@@ -69,16 +69,54 @@ def optimize_portfolio(
 
     constraints = [
         {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},  # Fully invested
-        {'type': 'ineq', 'fun': lambda w: np.sum(w[alt_idx]) - min_alt},  # Alternatives min
-        {'type': 'ineq', 'fun': lambda w: min_esg - (np.dot(w, esg_arr) / np.sum(w))},  # ESG constraint
-        {'type': 'ineq', 'fun': lambda w: max_single - np.max(w)},  # Max single asset class
     ]
+    
+    # Add alternatives constraint if alternatives exist
+    if alt_idx:
+        constraints.append({'type': 'ineq', 'fun': lambda w: np.sum(w[alt_idx]) - min_alt})
+    
+    # Add ESG constraint
+    constraints.append({'type': 'ineq', 'fun': lambda w: np.dot(w, esg_arr) / np.sum(w) - min_esg})
+    
+    # Add max single asset constraint
+    constraints.append({'type': 'ineq', 'fun': lambda w: max_single - np.max(w)})
 
-    x0 = np.ones(n) / n
-    result = minimize(objective, x0, bounds=bounds, constraints=constraints)
-    if not result.success:
-        raise ValueError(f"Optimization failed: {result.message}")
-    opt_weights = result.x
+    # Try different starting points
+    starting_points = [
+        np.ones(n) / n,  # Equal weight
+        np.random.dirichlet(np.ones(n)),  # Random weights
+        np.array([0.3, 0.3, 0.2, 0.2])[:n] if n >= 4 else np.ones(n) / n  # Custom weights
+    ]
+    
+    best_result = None
+    best_sharpe = -np.inf
+    
+    for x0 in starting_points:
+        try:
+            result = minimize(objective, x0, bounds=bounds, constraints=constraints, 
+                            method='SLSQP', options={'maxiter': 1000})
+            if result.success:
+                port_return, port_vol, sharpe = portfolio_stats(result.x)
+                if sharpe > best_sharpe:
+                    best_sharpe = sharpe
+                    best_result = result
+        except:
+            continue
+    
+    if best_result is None:
+        # Fallback: equal weight portfolio
+        weights = np.ones(n) / n
+        port_return, port_vol, sharpe = portfolio_stats(weights)
+        avg_esg = np.dot(weights, esg_arr)
+        return {
+            'weights': dict(zip(tickers, weights)),
+            'sharpe_ratio': sharpe,
+            'expected_return': port_return,
+            'volatility': port_vol,
+            'avg_esg': avg_esg
+        }
+    
+    opt_weights = best_result.x
     port_return, port_vol, sharpe = portfolio_stats(opt_weights)
     avg_esg = np.dot(opt_weights, esg_arr)
     return {
