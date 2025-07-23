@@ -1,0 +1,11 @@
+yfinance
+pandas
+numpy
+scipy
+matplotlib
+seaborn
+datetime
+plotly
+openpyxl
+xlsxwriter
+pytest 
