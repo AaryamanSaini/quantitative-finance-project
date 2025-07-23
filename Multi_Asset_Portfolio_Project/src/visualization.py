@@ -168,4 +168,36 @@ def plot_manager_comparison_scatter(manager_metrics, save_path=None):
     plt.grid(True)
     if save_path:
         plt.savefig(save_path, bbox_inches='tight', dpi=300)
+    plt.close()
+
+
+def plot_performance_attribution_waterfall(attribution_dict, save_path=None):
+    """
+    Plot a performance attribution waterfall chart.
+    Args:
+        attribution_dict (dict): Asset or factor to contribution value
+        save_path (str): If provided, save the plot to this path
+    """
+    import matplotlib.pyplot as plt
+    from matplotlib.ticker import FuncFormatter
+    labels = list(attribution_dict.keys())
+    values = list(attribution_dict.values())
+    cum_values = [0]
+    for v in values[:-1]:
+        cum_values.append(cum_values[-1] + v)
+    fig, ax = plt.subplots(figsize=(12, 6))
+    bars = ax.bar(labels, values, color=['green' if v >= 0 else 'red' for v in values])
+    ax.set_title('Performance Attribution Waterfall Chart')
+    ax.set_ylabel('Contribution')
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: f'{y:.2%}'))
+    for bar, value in zip(bars, values):
+        height = bar.get_height()
+        ax.annotate(f'{value:.2%}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),
+                    textcoords="offset points",
+                    ha='center', va='bottom', fontsize=9)
+    plt.grid(True, axis='y')
+    if save_path:
+        plt.savefig(save_path, bbox_inches='tight', dpi=300)
     plt.close() 
